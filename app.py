@@ -107,10 +107,22 @@ header[data-testid="stHeader"] {
     padding: 10px 0 40px 0;
     gap: 15px;
     scroll-behavior: smooth;
-    scrollbar-width: none;
+    scrollbar-width: thin;
+    scrollbar-color: #333 #141414;
 }
 .movie-row::-webkit-scrollbar {
-    display: none;
+    height: 8px;
+}
+.movie-row::-webkit-scrollbar-track {
+    background: #141414;
+    border-radius: 4px;
+}
+.movie-row::-webkit-scrollbar-thumb {
+    background: #333;
+    border-radius: 4px;
+}
+.movie-row::-webkit-scrollbar-thumb:hover {
+    background: #555;
 }
 .movie-card {
     position: relative;
@@ -258,7 +270,11 @@ def show_movie_row(title, movies_list):
 # =========================
 # TRENDING
 # =========================
-trending_movies = content_data.sample(8)['title'].tolist()
+@st.cache_data(show_spinner=False)
+def get_trending_movies():
+    return content_data.sample(8)['title'].tolist()
+
+trending_movies = get_trending_movies()
 show_movie_row("Trending Now", trending_movies)
 
 # =========================
@@ -300,11 +316,15 @@ st.markdown('</div>', unsafe_allow_html=True)
 # =========================
 # CATEGORY FUNCTION
 # =========================
-def show_category(title, genre):
+@st.cache_data(show_spinner=False)
+def get_category_movies(genre):
     filtered = content_data[
         content_data['genres'].str.contains(genre, case=False, na=False)
     ]
-    movies = filtered.sample(min(10, len(filtered)))['title'].tolist()
+    return filtered.sample(min(10, len(filtered)))['title'].tolist()
+
+def show_category(title, genre):
+    movies = get_category_movies(genre)
     show_movie_row(title, movies)
 
 # =========================
