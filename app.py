@@ -271,11 +271,14 @@ def show_movie_row(title, movies_list):
     st.markdown(html, unsafe_allow_html=True)
 
 # =========================
-# TRENDING
+# CACHED DATA FETCHING
 # =========================
+BLOCKLIST = ["Kaidan (2007)", "Gross Anatomy (a.k.a. A Cut Above) (1989)"]
+
 @st.cache_data(show_spinner=False)
 def get_trending_movies():
-    return content_data.sample(8)['title'].tolist()
+    safe_data = content_data[~content_data['title'].isin(BLOCKLIST)]
+    return safe_data.sample(8)['title'].tolist()
 
 trending_movies = get_trending_movies()
 show_movie_row("Trending Now", trending_movies)
@@ -324,6 +327,7 @@ def get_category_movies(genre):
     filtered = content_data[
         content_data['genres'].str.contains(genre, case=False, na=False)
     ]
+    filtered = filtered[~filtered['title'].isin(BLOCKLIST)]
     return filtered.sample(min(10, len(filtered)))['title'].tolist()
 
 def show_category(title, genre):
