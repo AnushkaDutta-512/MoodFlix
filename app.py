@@ -273,7 +273,7 @@ def show_movie_row(title, movies_list):
 # =========================
 # CACHED DATA FETCHING
 # =========================
-BLOCKLIST_REGEX = "Kaidan|Gross Anatomy|chitaram|lost room"
+BLOCKLIST_REGEX = "Kaidan|Gross Anatomy|chitaram|lost room|greater good"
 
 @st.cache_data(show_spinner=False)
 def get_trending_movies():
