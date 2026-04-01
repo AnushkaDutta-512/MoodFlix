@@ -2,6 +2,7 @@ import streamlit as st
 from train_model import recommend_collab, recommend_content, content_data, recommend_knn
 import requests
 import re
+import concurrent.futures
 
 API_KEY = "0ccb32327b5de020e6ea4f8a9f868ca5"
 DEFAULT_POSTER = "https://via.placeholder.com/200x300.png?text=No+Image"
@@ -202,40 +203,29 @@ def clean_title(title):
     return title.strip()
 
 # =========================
-# POSTER
+# MOVIE TMDB DATA
 # =========================
 @st.cache_data(show_spinner=False)
-def fetch_poster(movie_title):
+def fetch_movie_info(movie_title):
     try:
         movie_title = clean_title(movie_title)
         url = f"https://api.themoviedb.org/3/search/movie?api_key={API_KEY}&query={movie_title}"
-        data = requests.get(url).json()
+        data = requests.get(url, timeout=5).json()
 
-        if data["results"]:
-            poster = data["results"][0].get("poster_path")
-            if poster:
-                return "https://image.tmdb.org/t/p/w500/" + poster
-        return DEFAULT_POSTER
-    except:
-        return DEFAULT_POSTER
+        poster_url = DEFAULT_POSTER
+        rating = "N/A"
+        overview = "No description"
 
-# =========================
-# DETAILS
-# =========================
-@st.cache_data(show_spinner=False)
-def fetch_details(movie_title):
-    try:
-        movie_title = clean_title(movie_title)
-        url = f"https://api.themoviedb.org/3/search/movie?api_key={API_KEY}&query={movie_title}"
-        data = requests.get(url).json()
-
-        if data["results"]:
+        if data.get("results"):
             movie = data["results"][0]
-            return movie.get("vote_average", "N/A"), movie.get("overview", "No description")
+            if movie.get("poster_path"):
+                poster_url = "https://image.tmdb.org/t/p/w500/" + movie["poster_path"]
+            rating = movie.get("vote_average", "N/A")
+            overview = movie.get("overview", "No description")
 
-        return "N/A", "No description"
+        return poster_url, rating, overview
     except:
-        return "N/A", "No description"
+        return DEFAULT_POSTER, "N/A", "No description"
 
 # =========================
 # HOVER CARD
@@ -244,8 +234,7 @@ def fetch_details(movie_title):
 # MOVIE ROW RENDERING
 # =========================
 def get_movie_card_html(movie):
-    poster = fetch_poster(movie)
-    rating, overview = fetch_details(movie)
+    poster, rating, overview = fetch_movie_info(movie)
     return f"""
     <div class="movie-card">
         <img src="{poster}" alt="{movie}">
@@ -258,7 +247,10 @@ def get_movie_card_html(movie):
     """
 
 def show_movie_row(title, movies_list):
-    cards_html = "".join([get_movie_card_html(m) for m in movies_list])
+    with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
+        cards_html_list = list(executor.map(get_movie_card_html, movies_list))
+    
+    cards_html = "".join(cards_html_list)
     html = f"""
     <div class="movie-category-title">{title}</div>
     <div class="movie-row">
