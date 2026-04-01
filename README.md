@@ -3,7 +3,7 @@
 MoodFlix is an intelligent, high-performance Movie Recommendation Engine featuring a sleek, modern UI inspired by Netflix and Hotstar. It uses machine learning trained on TMDB datasets to deliver hyper-personalized movie suggestions.
 
 ## 🚀 Live Demo
-*(Insert your Streamlit Cloud link here!)*
+(https://moodflixmovierec.streamlit.app/)
 
 ## 🧠 The Recommendation Engines
 Under the hood, MoodFlix runs three distinct analysis algorithms to suggest the perfect movie:
