@@ -273,11 +273,11 @@ def show_movie_row(title, movies_list):
 # =========================
 # CACHED DATA FETCHING
 # =========================
-BLOCKLIST = ["Kaidan (2007)", "Gross Anatomy (a.k.a. A Cut Above) (1989)"]
+BLOCKLIST_REGEX = "Kaidan|Gross Anatomy|chitaram|lost room"
 
 @st.cache_data(show_spinner=False)
 def get_trending_movies():
-    safe_data = content_data[~content_data['title'].isin(BLOCKLIST)]
+    safe_data = content_data[~content_data['title'].str.contains(BLOCKLIST_REGEX, case=False, na=False)]
     return safe_data.sample(8)['title'].tolist()
 
 trending_movies = get_trending_movies()
@@ -327,7 +327,7 @@ def get_category_movies(genre):
     filtered = content_data[
         content_data['genres'].str.contains(genre, case=False, na=False)
     ]
-    filtered = filtered[~filtered['title'].isin(BLOCKLIST)]
+    filtered = filtered[~filtered['title'].str.contains(BLOCKLIST_REGEX, case=False, na=False)]
     return filtered.sample(min(10, len(filtered)))['title'].tolist()
 
 def show_category(title, genre):
