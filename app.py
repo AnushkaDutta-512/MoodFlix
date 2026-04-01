@@ -5,7 +5,7 @@ import re
 import concurrent.futures
 
 API_KEY = "0ccb32327b5de020e6ea4f8a9f868ca5"
-DEFAULT_POSTER = "https://via.placeholder.com/200x300.png?text=No+Image"
+DEFAULT_POSTER = "https://dummyimage.com/200x300/141414/e5e5e5.png?text=No+Poster"
 
 st.set_page_config(layout="wide")
 
@@ -164,6 +164,14 @@ header[data-testid="stHeader"] {
 .movie-card:hover .overlay {
     opacity: 1;
 }
+.movie-desc {
+    display: -webkit-box;
+    -webkit-line-clamp: 6;
+    -webkit-box-orient: vertical;  
+    overflow: hidden;
+    margin-top: 5px;
+    font-size: 0.75rem;
+}
 
 /* Hide Streamlit Default Forms */
 [data-testid="stForm"] {
@@ -195,7 +203,8 @@ st.markdown("""
 # CLEAN TITLE
 # =========================
 def clean_title(title):
-    title = re.sub(r"\(\d{4}\)", "", title)
+    # Strip any text inside parentheses, like (1989) or (a.k.a. A Cut Above)
+    title = re.sub(r"\(.*?\)", "", title)
     if ", The" in title:
         title = "The " + title.replace(", The", "")
     if ", A" in title:
@@ -240,8 +249,8 @@ def get_movie_card_html(movie):
         <img src="{poster}" alt="{movie}">
         <div class="overlay">
             <strong>{movie}</strong><br>
-            ⭐ {rating}<br>
-            {overview[:80]}...
+            ⭐ {rating}
+            <div class="movie-desc">{overview}</div>
         </div>
     </div>
     """
