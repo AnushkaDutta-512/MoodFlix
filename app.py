@@ -6,7 +6,7 @@ import concurrent.futures
 import streamlit as st
 
 API_KEY = "0ccb32327b5de020e6ea4f8a9f868ca5"
-DEFAULT_POSTER = "https://fakeimg.pl/200x300/282828/eae0d0/?text=No+Poster"
+DEFAULT_POSTER = "https://upload.wikimedia.org/wikipedia/commons/6/65/No-Image-Placeholder.svg"
 
 st.set_page_config(layout="wide")
 
@@ -217,7 +217,7 @@ def clean_title(title):
 # =========================
 @st.cache_data(show_spinner=False)
 def fetch_movie_info(movie_title):
-    # Cache buster comment v3
+    cache_bust = 5  # Real variable to force Streamlit to wipe memory
     try:
         movie_title = clean_title(movie_title)
         url = f"https://api.themoviedb.org/3/search/movie?api_key={API_KEY}&query={movie_title}"
