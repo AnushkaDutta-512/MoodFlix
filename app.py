@@ -3,9 +3,10 @@ from train_model import recommend_collab, recommend_content, content_data, recom
 import requests
 import re
 import concurrent.futures
+import streamlit as st
 
 API_KEY = "0ccb32327b5de020e6ea4f8a9f868ca5"
-DEFAULT_POSTER = "https://dummyimage.com/200x300/141414/e5e5e5.png?text=No+Poster"
+DEFAULT_POSTER = "https://fakeimg.pl/200x300/282828/eae0d0/?text=No+Poster"
 
 st.set_page_config(layout="wide")
 
@@ -216,6 +217,7 @@ def clean_title(title):
 # =========================
 @st.cache_data(show_spinner=False)
 def fetch_movie_info(movie_title):
+    # Cache buster comment v3
     try:
         movie_title = clean_title(movie_title)
         url = f"https://api.themoviedb.org/3/search/movie?api_key={API_KEY}&query={movie_title}"
